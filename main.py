@@ -123,12 +123,15 @@ while lobby == "on":
                 message = s.recv(1024).decode()
                 print()
                 if f"{client_color}{name}{Fore.RESET}>{Fore.RESET}" in message:
-                    x = message.replace(name , "me")
-                    print(x)
+                    
+                    print(message.replace(name , "me"))
+                    
                 else:
                     print(message)
-                #try:
-                    #playsound('/stuff/tok.mp3')
+                try:
+                    playsound('/stuff/tok.mp3')
+                except:
+                    pass
 
 
         # receive massages
