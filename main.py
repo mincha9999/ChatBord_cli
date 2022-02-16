@@ -7,9 +7,6 @@ import random
 from threading import Thread
 import urllib.request
 
-import time
-import sys
-
 try:
     from colorama import Fore, init, Back
     from playsound import playsound
@@ -47,7 +44,16 @@ def check_connection(successfull_massage, unsuccessful_massage, if_exit):
             sys.exit()
         else:
             pass
+
+
+def CB_command_quit():
+    s.send(f"{name} has left the chat! ({date_now})".encode())
+def CB_command_changecolor():
+    client_color = random.choice(colors)
+
 EXCLAIMATION_sign = Fore.YELLOW + "[!]" + Fore.RESET
+ERROR_sign = Fore.YELLOW + "[" + Fore.RED + "X"+Fore.YELLOW + "]" + Fore.RESET
+FACT_sign = Fore.YELLOW + "[" + Fore.LIGHTBLUE_EX + "+" + Fore.YELLOW + "]" + Fore.RESET
 
 date_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # current time info
 clear_screen()
@@ -79,10 +85,10 @@ while lobby == "on":
         ]
         client_color = random.choice(colors)  # random color for client
 
-        #SERVER_HOST = input(Fore.RESET + "enter server's IP: " + Fore.GREEN)  # server's IP
-        #SERVER_PORT = int(input(Fore.RESET + "enter server's port: " + Fore.GREEN))  # server's port
-        SERVER_HOST = "127.0.0.1"
-        SERVER_PORT = 4444
+        SERVER_HOST = input(Fore.RESET + "enter server's IP: " + Fore.GREEN)  # server's IP
+        SERVER_PORT = int(input(Fore.RESET + "enter server's port: " + Fore.GREEN))  # server's port
+        #SERVER_HOST = "127.0.0.1"
+        #SERVER_PORT = 4444
         print("" + Fore.RESET)
         separator_token = " "  # this is to separate the client name & message
 
@@ -95,8 +101,10 @@ while lobby == "on":
             
         except ConnectionRefusedError:
             print(Fore.RED + "[X] machine refused to connect")
-            print(Fore.YELLOW + "try contacting host to recreate a chatroom" + Fore.RESET)
+            print(Fore.YELLOW + "host might have stopped the room, try contacting host to recreate a chatroom" + Fore.RESET)
             print(Fore.YELLOW + "you may have entered wrong port " + Fore.RESET)
+            print(Fore.YELLOW + "the server may has expired " + Fore.RESET)
+            print(Fore.YELLOW + "you may not have internet connection " + Fore.RESET)
             break
         except TimeoutError:
             print(Fore.RED + "[X] timed out connection")
@@ -116,23 +124,21 @@ while lobby == "on":
 
         notice = f"{name} joined this chat! ({date_now})\n"
         s.send(notice.encode())
+        #print(f'You joined this chat!  ({date_now})\n')
 
 
         def listen_for_messages():
             while True:
                 message = s.recv(1024).decode()
                 print()
-                if f"{client_color}{name}{Fore.RESET}>{Fore.RESET}" in message:
-                    
-                    print(message.replace(name , "me"))
-                    
-                else:
-                    print(message)
-                try:
-                    playsound('/stuff/tok.mp3')
-                except:
-                    pass
+                message_for_me = message.replace(f'{client_color}{name}{Fore.RESET}>{Fore.RESET}',f'{client_color}You{Fore.RESET}>{Fore.RESET}')
 
+               #if message_for_me == f"{client_color}You{Fore.RESET}>{Fore.RESET}":
+                    #playsound('/home/mincha/projects/ChatBord_cli/tok.mp3')
+                #else:
+                    #playsound('/home/mincha/projects/ChatBord_cli/bouce.wav')
+
+                print(message_for_me)
 
         # receive massages
         t = Thread(target=listen_for_messages)
@@ -140,15 +146,19 @@ while lobby == "on":
         t.start()
 
         while True:
-
             # input message we want to send to the server
             try:
-                #to_type = input(Fore.YELLOW + ">" + Fore.RESET)
-                to_send = f"{client_color}{name}{Fore.RESET}>{Fore.RESET}{input()}\r"
+                client_msg = input()
+                to_send = f"{client_color}{name}{Fore.RESET}>{Fore.RESET}{client_msg}"
                 s.send(to_send.encode())  # send massage
+
+
+
             except KeyboardInterrupt:
                 s.send(f"{name} has left the chat! ({date_now})".encode())
                 sys.exit()
+
+
 
 
 
